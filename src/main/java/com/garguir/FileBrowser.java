@@ -14,6 +14,7 @@ public class FileBrowser {
     private static final String OK = "ok";
     private static final String REQUEST = "Request";
     private static final String RESPONSE = "Response";
+    private static final String WITHOUT_EXTENSION = ".without_extension";
     private static final String LINE_ASTERISKS =   "***************************************************************************************************";
     private static final String LINE_EQUALS =      "===================================================================================================";
     private static final String LINE_UNDERLINEDS = "___________________________________________________________________________________________________";
@@ -45,9 +46,16 @@ public class FileBrowser {
         }
     }
 
+    private static String getNewPath(File file){
+        return PATH_NEW_FILES + file.getParent()
+                .replace(PATH_ORIGIN_FILES, "")
+                .replace("\\prp", "")
+                .replace(" ", "_") + "\\";
+    }
+
     private static void createDir(File file){
         if(!file.getName().equals("prp")) {
-            File newDir = new File(PATH_NEW_FILES + file.getParent().replace(PATH_ORIGIN_FILES, "") + "\\" + file.getName());
+            File newDir = new File( getNewPath(file) + file.getName().replace(" ","_"));
             if (!newDir.exists()) {
                 if (!newDir.mkdir()) {
                     LOGGER.warning("createDir >>>>>>>>>>>>>>>>>>>>>>>>>>> Error al crear Directorio " + newDir.getAbsolutePath());
@@ -57,10 +65,10 @@ public class FileBrowser {
     }
 
     private static String createNewDir(File file){
-        nro++;
+        //nro++;
         String fileName = getFileNameWithoutExtension(file.getName());
-        String newDirName = (fileName.length() > 0 && !onlySpaces(fileName))?fileName:Integer.toString(nro);
-        File newFileNameDir = new File(PATH_NEW_FILES + file.getParent().replace(PATH_ORIGIN_FILES, "").replace("\\prp", "") + "\\" + newDirName);
+        String newDirName = (fileName.length() > 0 && !onlySpaces(fileName))?fileName.replace(" ", "_"):Integer.toString(++nro);
+        File newFileNameDir = new File(getNewPath(file) + newDirName);
         File newOkDir = new File(newFileNameDir.toString().replace("\\prp", "") + "\\" + OK);
         if(!newFileNameDir.exists()){
             if(!newFileNameDir.mkdir()){
@@ -79,11 +87,16 @@ public class FileBrowser {
     }
 
     private static String getFileExtension(String fileName){
-        return fileName.substring(fileName.lastIndexOf("."));
+        int x = fileName.lastIndexOf(".");
+        if(x!=-1){
+            return fileName.substring(x);
+        }else{
+            return WITHOUT_EXTENSION;
+        }
     }
 
     private static String getFileNameWithoutExtension(String fileName){
-        return fileName.replace(getFileExtension(fileName),"");
+        return fileName.replace(getFileExtension(fileName),"").replace(" ", "_");
     }
 
     private static boolean onlySpaces(String s){
