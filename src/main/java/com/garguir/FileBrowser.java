@@ -34,7 +34,7 @@ public class FileBrowser {
     private static final String USER_DIR = System.getProperty("user.dir");
     private static final String PATH_ORIGIN_FILES = USER_DIR+"\\src\\main\\resources";
     private static final String PATH_NEW_FILES = USER_DIR+"\\specs\\";
-    private static final String PATH_TXT = USER_DIR+"\\specs\\urls.csv";
+    private static final String PATH_TXT = USER_DIR+"\\specs\\mocksURLs.csv";
     private static final String OK = "ok";
     private static final String REQUEST = "Request";
     private static final String RESPONSE = "Response";
