@@ -50,7 +50,7 @@ public class FileBrowser {
             if (files != null) {
                 for (File value : files) {
                     if (value.isFile()) {
-                        mockFiles.add(new MockFile(value.getName(), value.getParent()));
+                        mockFiles.add(new MockFile(value.getName(), value.getParent().replace(PATH_ORIGIN_FILES, "")));
                         createFiles(value);
                     } else if (value.isDirectory()) {
                         createDir(value);
@@ -141,7 +141,7 @@ public class FileBrowser {
         try{
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(PATH_TXT));
 
-            for(MockFile mockFile : this.mockFiles){
+            for(MockFile mockFile : this.mockFiles) {
                 stringBuilder.append(mockFile.getFileName());
                 stringBuilder.append(SEMICOLON);
                 stringBuilder.append(mockFile.getParentPath());
