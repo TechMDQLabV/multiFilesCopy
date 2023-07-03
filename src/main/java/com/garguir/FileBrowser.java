@@ -13,7 +13,24 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class FileBrowser {
+
     private static final Logger LOGGER = Logger.getLogger("FilesCopy");
+    private static final String REQUEST_CONTENT =
+            """
+            <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+            <bsvreq>
+                <header>
+                    <canal>${xmlunit.ignore}</canal>
+                    <password>${xmlunit.ignore}</password>
+                    <requerimiento>XXX</requerimiento>
+                    <usuario>${xmlunit.ignore}</usuario>
+                    <txid>${xmlunit.ignore}</txid>
+                </header>
+                <data>
+                </data>
+            </bsvreq>
+            """;
+
     private static final String USER_DIR = System.getProperty("user.dir");
     private static final String PATH_ORIGIN_FILES = USER_DIR+"\\src\\main\\resources";
     private static final String PATH_NEW_FILES = USER_DIR+"\\specs\\";
@@ -48,13 +65,13 @@ public class FileBrowser {
             File[] files = file.listFiles();
 
             if (files != null) {
-                for (File value : files) {
-                    if (value.isFile()) {
-                        mockFiles.add(new MockFile(value.getName(), value.getParent().replace(PATH_ORIGIN_FILES, "")));
-                        createFiles(value);
-                    } else if (value.isDirectory()) {
-                        createDir(value);
-                        listFiles(value.getAbsolutePath());
+                for (File file1 : files) {
+                    if (file1.isFile()) {
+                        mockFiles.add(new MockFile(file1.getName(), file1.getParent().replace(PATH_ORIGIN_FILES, "")));
+                        createFiles(file1);
+                    } else if (file1.isDirectory()) {
+                        createDir(file1);
+                        listFiles(file1.getAbsolutePath());
                     }
                 }
             }
@@ -122,16 +139,29 @@ public class FileBrowser {
     }
 
     private void createFiles(File file) throws IOException {
+        String fileName = file.getName();
         String newDestinyDir = createNewDir(file);
-        String fileExtension = getFileExtension(file.getName());
+        String fileExtension = getFileExtension(fileName);
         File newResponseFile = new File(newDestinyDir + "\\" + RESPONSE + fileExtension);
-        File newRequestFile = new File(newDestinyDir + "\\" + REQUEST + fileExtension);
-        newRequestFile.createNewFile();
+        String newRequestFile = newDestinyDir + "\\" + REQUEST + fileExtension;
+        createRequest(newRequestFile,fileName.replace(fileExtension, ""));
         try {
             Files.copy(file.toPath(), newResponseFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             LOGGER.info("Copiando archivo a la nueva carpeta: " + newDestinyDir);
         } catch (IOException e) {
             LOGGER.warning("Error al escribir el archivo: "+e);
+        }
+    }
+
+    private void createRequest(String path, String requirement){
+        try{
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path));
+
+            bufferedWriter.write(REQUEST_CONTENT.replace("XXX",requirement));
+            bufferedWriter.close();
+            LOGGER.info("Archivo request guardado");
+        }catch (IOException ioException){
+            LOGGER.warning("Error: Fallo de escritura del archivo request " + ioException);
         }
     }
 
