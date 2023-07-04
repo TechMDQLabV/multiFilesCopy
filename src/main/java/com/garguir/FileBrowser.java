@@ -27,6 +27,7 @@ public class FileBrowser {
                     <txid>${xmlunit.ignore}</txid>
                 </header>
                 <data>
+                    ${xmlunit.ignore}
                 </data>
             </bsvreq>
             """;
